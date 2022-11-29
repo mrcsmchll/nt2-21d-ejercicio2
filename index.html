@@ -12,19 +12,27 @@
 
 </head>
 
-
 <div class="container-fluid mt-3" id="app">
-    <input type="text" class="form-control" v-model="criterioDeBusqueda"
-        placeholder="Ingresar un criterio de busqueda...">
+    <input type="text" class="form-control" v-model="criterioDeBusquedaNomApe"
+    placeholder="Ingresar un nombre o apellido">
     <br>
+    <input type="text" class="form-control" v-model="criterioDeBusquedaDni" placeholder="Ingresar DNI">
+    <br>
+    <div class="alert alert-danger" role="alert" v-if="alertDni || alertNombre">
+        Escribe al menos 3 caracteres
+    </div>
+    
+    <br>
+    <br>
+
     <div class="card-deck m-0">
         <div class="row">
             <div class="col" v-for="persona in personasFiltradas">
                 <div class="card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">{{getNombreCompleto(persona)}}</h5>
-                        <p class="card-text">dni {{persona.dni}}</p>
-                        <a href="#" class="card-link">{{persona.correo}}</a>
+                        <p class="card-text">DNI: {{persona.dni}}</p>
+                        <a href="#" class="card-link"><i>{{persona.correo}}</i></a>
                     </div>
                 </div>
             </div>
@@ -39,7 +47,8 @@
     new Vue({
         el: '#app',
         data: {
-            criterioDeBusqueda: '',
+            criterioDeBusquedaNomApe: '',
+            criterioDeBusquedaDni: '',
             //Aquí, en este array es donde tienen que agregar su información
             personas: [
                 {
@@ -49,20 +58,50 @@
                     dni: "20442873"
                 },
                 {
-                    nombre: "...",
-                    apellido: "...",
-                    correo: "...",
-                    dni: "..."
+                    nombre: "Marcos",
+                    apellido: "Manchinelli",
+                    correo: "manchinelli.m@gmail.com",
+                    dni: "37360946"
+                },
+                {
+                    nombre: "Gerardo",
+                    apellido: "Benitez",
+                    correo: "gb202@gmail.com",
+                    dni: "23021993"
                 },
             ]
 
         },
         computed: {
-            personasFiltradas() {
+            personasFiltradasNomApe() {
                 return this.personas.filter((persona) => {
-                    let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                    let registroCompleto = `${persona.nombre} ${persona.apellido}`
+                    return registroCompleto.toLowerCase().includes(this.criterioDeBusquedaNomApe.toLowerCase())
                 });
+            },
+            personasFiltradasDni() {
+                return this.personas.filter((persona) => {
+                    return persona.dni.includes(this.criterioDeBusquedaDni)
+                });
+            },
+            personasFiltradas() {
+                return this.personasFiltradasDni.filter((persona) => {
+                    return this.personasFiltradasNomApe.includes(persona)
+                })
+            },
+            alertNombre() {
+                let result = false
+                if (this.criterioDeBusquedaNomApe.length < 3 && this.criterioDeBusquedaNomApe.length != "") {
+                    result = true
+                }
+                return result
+            },
+            alertDni() {
+                let result = false
+                if (this.criterioDeBusquedaDni.length < 3 && this.criterioDeBusquedaDni.length != "") {
+                    result = true
+                }
+                return result
             }
         },
         methods: {
